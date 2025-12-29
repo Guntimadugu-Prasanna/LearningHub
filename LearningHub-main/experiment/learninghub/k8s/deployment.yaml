@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learninghub-deployment
+  labels:
+    app: learninghub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: learninghub
+  template:
+    metadata:
+      labels:
+        app: learninghub
+    spec:
+      containers:
+        - name: learninghub-container
+          image: learninghub:latest   # Docker image you build locally
+          imagePullPolicy: Never      # REQUIRED for local images
+          ports:
+            - containerPort: 5174     # Vite default port
+          env:
+            - name: HOST
+              value: "0.0.0.0"        # Vite needs this to run inside container
