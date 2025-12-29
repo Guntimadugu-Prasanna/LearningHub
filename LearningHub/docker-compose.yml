@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    container_name: mysql-db
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: learninghub
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  backend:
+    container_name: springboot-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/learninghub
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+volumes:
+  mysql-data:
